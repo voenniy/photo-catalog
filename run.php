@@ -15,6 +15,9 @@ $config = [
     'in' => [
         __DIR__ . '/tmp/in'
     ],
+    'exclude' => [
+
+    ],
     'out' => __DIR__ . '/tmp/out/',
     'stops' => [
         'min_size_w' => 500,
@@ -30,14 +33,15 @@ $photos = new Photos($config);
 
 logger('Count: '. $photos->count());
 
-$output = new ConsoleOutput();
+$output = new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG);
 $output->setFormatter(new OutputFormatter(true));
 $progressBar = new ProgressBar($output, $photos->count());
 
-$added = 0;
+$added = $double = $errors = 0;
 foreach ($photos as $photo){
 
     if(!$photo){
+        $errors++;
         continue;
     }
 
@@ -51,6 +55,7 @@ foreach ($photos as $photo){
             $photo->move();
             $added++;
         } catch (PhotoException $e){
+            $errors++;
             logger($e->getMessage(), $e->params);
         }
 
@@ -59,6 +64,7 @@ foreach ($photos as $photo){
         $photo->date->add(new DateInterval("PT".$i."S"));
         goto copy;
     } else {
+        $double++;
         // Если это дубликат файла по md5  - то просто удаляем его
         //unlink($photo->filename);
         logger('Обнаружен дубликат', ['old' => $photo->newFileName(), 'new'=>$photo->filename]);
@@ -66,6 +72,9 @@ foreach ($photos as $photo){
 
     $progressBar->advance();
 }
-$progressBar->finish();
-$output->writeln('Обработано ' . $photos->count() . ' фоток');
-$output->writeln('Добавлено ' . $added . ' фоток');
+//$progressBar->finish();
+$output->writeln('');
+$table = new Table($output);
+$table->setHeaders(['Обработано', 'Добавлено', 'Дублей', 'Ошибок']);
+$table->addRow([$photos->count(), $added, $double, $errors]);
+$table->render();
