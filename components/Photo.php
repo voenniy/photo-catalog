@@ -85,7 +85,7 @@ class Photo
         if(!copy($this->filename, $newFilename)){
             throw new PhotoException('Не удалось скопировать фото ', null, ['old' => $this->filename, 'new'=>$newFilename]);
         } else {
-            logger($this->filename . ' => ' . $newFilename);
+            //logger($this->filename . ' => ' . $newFilename);
             //  unlink($this->filename);
             $this->filename = $newFilename;
         }

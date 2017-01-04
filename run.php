@@ -60,7 +60,8 @@ foreach ($photos as $photo){
         goto copy;
     } else {
         // Если это дубликат файла по md5  - то просто удаляем его
-        //unlink($filename);
+        //unlink($photo->filename);
+        logger('Обнаружен дубликат', ['old' => $photo->newFileName(), 'new'=>$photo->filename]);
     }
 
     $progressBar->advance();
