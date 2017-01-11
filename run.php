@@ -9,25 +9,7 @@ use Symfony\Component\Console\Helper\Table;
 use components\Photos;
 use components\exceptions\PhotoException;
 
-
-
-$config = [
-    'in' => [
-        __DIR__ . '/tmp/in'
-    ],
-    'exclude' => [
-
-    ],
-    'out' => __DIR__ . '/tmp/out/',
-    'stops' => [
-        'min_size_w' => 500,
-        'min_size_h' => 900,
-        'dates' => [
-            '2007:00:00 00:00:00',
-            ''
-        ]
-    ]
-];
+$config = require 'config.php';
 
 $photos = new Photos($config);
 
@@ -72,7 +54,7 @@ foreach ($photos as $photo){
 
     $progressBar->advance();
 }
-//$progressBar->finish();
+$progressBar->finish();
 $output->writeln('');
 $table = new Table($output);
 $table->setHeaders(['Обработано', 'Добавлено', 'Дублей', 'Ошибок']);
